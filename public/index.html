@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="DevTrack helps software teams plan projects, manage tasks, and make progress visible." >
+  <meta name="theme-color" content="#f5f6fb">
+  <meta property="og:title" content="DevTrack — build with clarity">
+  <meta property="og:description" content="A clear workspace for software projects, tasks, and team progress.">
+  <title>DevTrack — Developer workspace</title>
+  <style>
+    :root {
+      --site-primary: #5B5CE2;
+      --site-on-primary: #FFFFFF;
+      --site-secondary: #16A994;
+      --site-on-secondary: #052D2A;
+      --site-background: #F5F6FB;
+      --site-on-background: #20243A;
+      --site-font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --site-font-heading: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --site-heading-scale: 1;
+      --site-spacing-scale: 1;
+      --site-radius-scale: 1;
+      --site-decoration-opacity: 1;
+      --ink: #24283d;
+      --muted: #858ba3;
+      --line: #e8eaf2;
+      --surface: #ffffff;
+      --surface-soft: #f8f9fd;
+      --navy: #191d33;
+      --navy-2: #242944;
+      --green: #159b82;
+      --amber: #d78a24;
+      --red: #db6572;
+      --blue-soft: #eeeefe;
+      --shadow: 0 16px 44px rgba(34, 39, 72, .08);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; font-family: var(--site-font-body); background: var(--site-background); color: var(--site-on-background); }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible { outline: 3px solid color-mix(in srgb, var(--site-primary) 42%, transparent); outline-offset: 2px; }
+    a { color: inherit; text-decoration: none; }
+    #app { min-height: 100vh; width: 100%; border-radius: 0; background-color: light-dark(var(--site-background), #111421); color: light-dark(var(--site-on-background), #F1F2FA); display: flex; }
+    .sidebar { position: fixed; inset: 0 auto 0 0; width: 244px; background: var(--navy); color: #f8f8ff; display: flex; flex-direction: column; padding: calc(25px * var(--site-spacing-scale)) 16px 18px; z-index: 20; overflow-y: auto; }
+    .brand { display: flex; align-items: center; gap: 11px; padding: 0 10px 30px; color: #fff; font-weight: 750; font-size: 19px; letter-spacing: -.7px; }
+    .brand-mark { width: 35px; height: 35px; display: grid; place-items: center; background: linear-gradient(145deg, var(--site-primary), #8585ff); border-radius: 12px; box-shadow: 0 6px 20px rgba(91,92,226,.35); }
+    .brand-mark svg { width: 23px; height: 23px; }
+    .workspace-label { margin: 0 10px 10px; color: #858ca8; text-transform: uppercase; font-size: 10px; letter-spacing: 1.5px; font-weight: 800; }
+    .nav-list { display: grid; gap: 5px; }
+    .nav-button { width: 100%; display: flex; gap: 13px; align-items: center; border: 0; background: transparent; color: #aeb4cb; border-radius: 10px; padding: 12px 13px; text-align: left; font-size: 13px; transition: background .18s ease, color .18s ease, transform .18s ease; }
+    .nav-button:hover { background: rgba(255,255,255,.07); color: white; }
+    .nav-button.active { background: linear-gradient(100deg, var(--site-primary), #6869ed); color: #fff; box-shadow: 0 8px 20px rgba(91,92,226,.23); }
+    .nav-button svg { width: 18px; height: 18px; flex: 0 0 auto; }
+    .nav-count { margin-left: auto; min-width: 22px; padding: 2px 6px; background: rgba(255,255,255,.12); border-radius: 6px; color: #e1e3f6; font-size: 10px; text-align: center; }
+    .side-spacer { flex: 1; min-height: 24px; }
+    .side-projects { padding: 14px 4px 20px; }
+    .side-projects-head { display: flex; align-items: center; justify-content: space-between; margin: 0 8px 12px; color: #9299b5; font-size: 10px; text-transform: uppercase; font-weight: 800; letter-spacing: 1.25px; }
+    .icon-small { border: 0; background: transparent; color: inherit; padding: 4px; display: inline-grid; place-items: center; border-radius: 7px; }
+    .icon-small:hover { background: rgba(255,255,255,.1); }
+    .side-project { display: flex; align-items: center; gap: 10px; padding: 9px 9px; color: #b6bad0; font-size: 12px; border-radius: 8px; cursor: pointer; }
+    .side-project:hover { background: rgba(255,255,255,.06); color: white; }
+    .project-dot { width: 8px; height: 8px; border-radius: 3px; background: var(--dot, #7778ed); }
+    .side-promo { padding: 16px; border: 1px solid rgba(255,255,255,.1); border-radius: 13px; background: linear-gradient(145deg, #252a49, #1b2039); }
+    .promo-spark { width: 28px; height: 28px; display: grid; place-items: center; color: #bcbcff; background: rgba(116,117,245,.19); border-radius: 9px; margin-bottom: 10px; }
+    .side-promo strong { display: block; font-size: 12px; margin-bottom: 5px; }
+    .side-promo p { color: #a3aac3; font-size: 10px; line-height: 1.6; margin: 0 0 12px; }
+    .promo-link { border: 0; padding: 0; color: #c7c7ff; font-size: 11px; background: none; font-weight: 700; }
+    .user-mini { display: flex; gap: 10px; align-items: center; padding: 18px 8px 0; border-top: 1px solid rgba(255,255,255,.1); margin-top: 18px; }
+    .avatar { display: grid; place-items: center; flex: 0 0 auto; width: 34px; height: 34px; border-radius: 11px; color: #fff; font-size: 11px; font-weight: 800; background: linear-gradient(135deg, #e19b75, #a666a6); }
+    .user-mini strong { display: block; font-size: 11px; font-weight: 650; }
+    .user-mini small { display: block; color: #9ba2bc; font-size: 10px; margin-top: 4px; }
+    .user-more { margin-left: auto; color: #aab0c5; }
+    .main-shell { min-width: 0; width: calc(100% - 244px); margin-left: 244px; }
+    .topbar { height: 77px; display: flex; align-items: center; justify-content: space-between; gap: 18px; background: var(--surface); border-bottom: 1px solid var(--line); padding: 0 34px; position: sticky; top: 0; z-index: 10; }
+    .crumb { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; }
+    .crumb strong { color: var(--ink); font-weight: 700; }
+    .top-actions { display: flex; align-items: center; gap: 13px; }
+    .searchbox { position: relative; width: min(270px, 28vw); }
+    .searchbox svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9298ad; width: 16px; height: 16px; }
+    .searchbox input { width: 100%; border: 1px solid #eceef5; background: #f9fafe; border-radius: 9px; height: 38px; padding: 0 12px 0 37px; outline: none; color: var(--ink); font-size: 11px; }
+    .searchbox input:focus { border-color: #b4b4f6; background: #fff; }
+    .kbd { position: absolute; right: 9px; top: 50%; transform: translateY(-50%); padding: 3px 5px; border: 1px solid #e4e6ee; color: #989eb2; border-radius: 4px; font-size: 9px; background: white; }
+    .top-icon { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid #eceef5; border-radius: 10px; background: white; color: #737a94; position: relative; }
+    .top-icon:hover { background: #f7f7ff; color: var(--site-primary); }
+    .top-icon svg { width: 17px; height: 17px; }
+    .notify-dot { position: absolute; top: 7px; right: 7px; width: 6px; height: 6px; border-radius: 50%; background: #ef6e7c; border: 1.5px solid #fff; }
+    .mobile-menu { display: none; }
+    .content { max-width: 1440px; margin: 0 auto; padding: 31px 34px 50px; }
+    .page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 25px; }
+    .eyebrow { color: var(--site-primary); font-weight: 800; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; margin: 0 0 7px; }
+    h1 { font-family: var(--site-font-heading); font-size: calc(27px * var(--site-heading-scale)); letter-spacing: -1.1px; line-height: 1.15; color: var(--ink); margin: 0; font-weight: 780; }
+    .subheading { margin: 9px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .heading-actions { display: flex; align-items: center; gap: 9px; }
+    .btn { border: 1px solid #e5e7f0; background: white; border-radius: 9px; min-height: 38px; padding: 0 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: #565c75; font-size: 11px; font-weight: 700; transition: transform .18s ease, box-shadow .18s ease, background .18s ease; }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(35,39,68,.08); }
+    .btn svg { width: 15px; height: 15px; }
+    .btn-primary { color: white; background: var(--site-primary); border-color: var(--site-primary); box-shadow: 0 6px 15px rgba(91,92,226,.19); }
+    .btn-primary:hover { background: #4d4ed3; }
+    .btn-secondary { background: var(--site-secondary); color: var(--site-on-secondary); border-color: var(--site-secondary); }
+    .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 15px; margin-bottom: 18px; }
+    .metric-card { background: var(--surface); border: 1px solid var(--line); border-radius: calc(14px * var(--site-radius-scale)); padding: 18px 18px 16px; min-height: 134px; position: relative; overflow: hidden; }
+    .metric-top { display: flex; align-items: center; justify-content: space-between; color: #7c829a; font-size: 11px; font-weight: 600; }
+    .metric-icon { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; background: #efefff; color: var(--site-primary); }
+    .metric-icon.green { background: #e4f8f2; color: #0f9c82; }
+    .metric-icon.amber { background: #fff4e3; color: #cd8724; }
+    .metric-icon.rose { background: #fff0f1; color: #df6c7b; }
+    .metric-icon svg { width: 16px; height: 16px; }
+    .metric-number { font-size: 29px; letter-spacing: -1.3px; font-weight: 780; color: var(--ink); margin: 13px 0 8px; }
+    .metric-foot { display: flex; align-items: center; gap: 6px; color: #8b91a6; font-size: 10px; }
+    .trend { color: #159a7f; background: #e8f8f3; padding: 3px 5px; border-radius: 5px; font-weight: 800; }
+    .trend.down { color: #c86d43; background: #fff1e8; }
+    .dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.57fr) minmax(285px, .93fr); gap: 18px; margin-bottom: 18px; }
+    .panel { min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: calc(14px * var(--site-radius-scale)); overflow: hidden; }
+    .panel-head { padding: 19px 20px 15px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .panel-title { color: var(--ink); font-size: 13px; font-weight: 760; letter-spacing: -.2px; }
+    .panel-subtitle { color: #9399ad; font-size: 10px; margin-top: 5px; }
+    .text-link { display: inline-flex; align-items: center; gap: 5px; border: 0; background: transparent; color: var(--site-primary); font-size: 10px; font-weight: 800; padding: 4px 0; white-space: nowrap; }
+    .text-link svg { width: 13px; height: 13px; }
+    .chart-wrap { padding: 5px 19px 15px; }
+    .chart-legend { display: flex; align-items: center; gap: 17px; font-size: 10px; color: #888ea3; }
+    .legend-key { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 7px; height: 7px; border-radius: 3px; background: var(--site-primary); }
+    .legend-dot.teal { background: var(--site-secondary); }
+    .chart-svg { display: block; width: 100%; height: auto; max-height: 226px; margin-top: 9px; overflow: visible; }
+    .chart-svg text { font-family: var(--site-font-body); }
+    .goal-card { background: linear-gradient(135deg, #252a49, #1d2340); color: #fff; border: 0; position: relative; }
+    .goal-card::before { content: ""; position: absolute; width: 180px; height: 180px; border-radius: 50%; right: -60px; top: -75px; background: rgba(22,169,148,.24); filter: blur(1px); opacity: var(--site-decoration-opacity); }
+    .goal-head { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding: 20px 20px 12px; }
+    .goal-head .panel-title { color: #fff; }
+    .goal-head .panel-subtitle { color: #a0a8c4; }
+    .goal-tag { color: #8be0cf; background: rgba(22,169,148,.17); border: 1px solid rgba(22,169,148,.25); border-radius: 6px; font-size: 9px; font-weight: 800; padding: 5px 7px; }
+    .goal-content { padding: 8px 20px 20px; position: relative; z-index: 1; }
+    .goal-number { font-size: 36px; letter-spacing: -1.5px; font-weight: 790; }
+    .goal-number span { color: #a4aed0; font-size: 13px; font-weight: 500; letter-spacing: 0; }
+    .progress-track { width: 100%; height: 7px; border-radius: 9px; background: rgba(255,255,255,.12); overflow: hidden; margin: 13px 0 9px; }
+    .progress-track span { display: block; height: 100%; border-radius: 9px; background: linear-gradient(90deg, #17b39a, #75ddc9); }
+    .goal-foot { display: flex; align-items: center; justify-content: space-between; color: #aab1c9; font-size: 10px; }
+    .goal-foot strong { color: #d9fff5; }
+    .goal-divider { height: 1px; background: rgba(255,255,255,.12); margin: 19px 0 16px; }
+    .goal-milestone { display: flex; gap: 10px; align-items: center; }
+    .milestone-icon { flex: 0 0 auto; display: grid; place-items: center; width: 31px; height: 31px; border-radius: 10px; background: rgba(255,255,255,.1); color: #9ce6d8; }
+    .milestone-icon svg { width: 16px; height: 16px; }
+    .goal-milestone strong { display: block; font-size: 11px; }
+    .goal-milestone small { display: block; font-size: 10px; color: #a5adc8; margin-top: 4px; }
+    .lower-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(290px, .9fr); gap: 18px; }
+    .project-list { display: grid; }
+    .project-row { display: grid; grid-template-columns: minmax(0, 1fr) 94px 74px; align-items: center; gap: 15px; padding: 14px 20px; border-top: 1px solid #f0f1f6; cursor: pointer; transition: background .15s ease; }
+    .project-row:hover { background: #fafaff; }
+    .project-id { display: flex; align-items: center; gap: 11px; min-width: 0; }
+    .project-icon { flex: 0 0 auto; width: 35px; height: 35px; display: grid; place-items: center; border-radius: 11px; background: #eeeefe; color: var(--site-primary); }
+    .project-icon.teal { background: #e3f8f3; color: #139b84; }
+    .project-icon.orange { background: #fff2e2; color: #ce8725; }
+    .project-icon.pink { background: #fff0f3; color: #d76581; }
+    .project-icon svg { width: 17px; height: 17px; }
+    .project-name { font-size: 11px; font-weight: 760; color: #32374f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .project-owner { font-size: 9px; color: #989db0; margin-top: 5px; }
+    .mini-progress { height: 5px; background: #eff0f7; border-radius: 9px; overflow: hidden; margin-top: 7px; }
+    .mini-progress span { display: block; height: 100%; border-radius: inherit; background: var(--site-primary); }
+    .project-percent { font-size: 10px; color: #656c85; font-weight: 750; margin-top: 4px; }
+    .status { font-size: 9px; font-weight: 750; padding: 6px 8px; border-radius: 6px; text-align: center; justify-self: start; white-space: nowrap; }
+    .status.on-track { color: #14856f; background: #e7f8f2; }
+    .status.review { color: #be7b22; background: #fff4e3; }
+    .status.planning { color: #5c5ccf; background: #eeeefe; }
+    .task-list { padding: 0 19px 9px; }
+    .task-row { display: flex; align-items: flex-start; gap: 10px; border-top: 1px solid #f0f1f6; padding: 13px 0; }
+    .task-check { appearance: none; width: 16px; height: 16px; border: 1.5px solid #d8dbea; border-radius: 5px; flex: 0 0 auto; margin: 1px 0 0; cursor: pointer; position: relative; }
+    .task-check:checked { background: var(--site-primary); border-color: var(--site-primary); }
+    .task-check:checked::after { content: "✓"; color: white; position: absolute; inset: -1px 0 0; font-size: 11px; text-align: center; line-height: 15px; font-weight: 900; }
+    .task-copy { flex: 1; min-width: 0; }
+    .task-copy strong { display: block; color: #434961; font-size: 10px; font-weight: 670; line-height: 1.45; }
+    .task-copy small { display: block; color: #999fb2; margin-top: 5px; font-size: 9px; }
+    .task-priority { font-size: 9px; font-weight: 800; white-space: nowrap; margin-top: 1px; }
+    .priority-high { color: #d86674; }
+    .priority-medium { color: #c18a32; }
+    .priority-low { color: #139a83; }
+    .empty-state { text-align: center; padding: 32px 15px; color: var(--muted); font-size: 12px; }
+    .empty-state svg { width: 30px; height: 30px; color: #b0b4ce; margin-bottom: 10px; }
+    .page-view[hidden] { display: none !important; }
+    .page-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 19px; }
+    .filter-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .filter-pill { border: 1px solid #e7e9f2; color: #81879d; background: white; padding: 8px 11px; border-radius: 8px; font-size: 10px; font-weight: 700; }
+    .filter-pill.active { color: var(--site-primary); background: #f0f0ff; border-color: #d9d9ff; }
+    .projects-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; }
+    .project-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; cursor: pointer; transition: transform .18s ease, box-shadow .18s ease; }
+    .project-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .project-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+    .project-card h3 { color: var(--ink); font-size: 13px; margin: 14px 0 7px; }
+    .project-card p { color: var(--muted); font-size: 10px; line-height: 1.7; min-height: 35px; margin: 0; }
+    .card-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 17px; font-size: 10px; color: #858ba2; }
+    .avatars { display: flex; align-items: center; }
+    .avatar-stack { width: 24px; height: 24px; margin-left: -5px; display: grid; place-items: center; border: 2px solid white; border-radius: 50%; background: #e2e5fb; color: #595b9d; font-size: 8px; font-weight: 800; }
+    .avatar-stack:first-child { margin-left: 0; }
+    .table-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+    .data-table { border-collapse: collapse; width: 100%; text-align: left; }
+    .data-table th { background: #fafbfe; color: #9298ac; text-transform: uppercase; letter-spacing: .8px; font-size: 9px; padding: 14px 17px; font-weight: 800; }
+    .data-table td { color: #606780; font-size: 10px; padding: 14px 17px; border-top: 1px solid #f0f1f6; }
+    .data-table tr:hover td { background: #fcfcff; }
+    .task-title-cell { color: #3c4158 !important; font-weight: 700; }
+    .task-label { display: inline-block; border-radius: 5px; padding: 5px 7px; background: #f0f0ff; color: #6566cf; font-size: 9px; font-weight: 750; }
+    .task-label.green { color: #16836e; background: #e8f8f2; }
+    .task-label.orange { color: #bd7c24; background: #fff4e4; }
+    .activity-feed { background: white; border: 1px solid var(--line); border-radius: 14px; padding: 4px 22px; }
+    .activity-item { display: flex; gap: 13px; padding: 19px 0; border-bottom: 1px solid #f0f1f6; }
+    .activity-item:last-child { border-bottom: 0; }
+    .activity-icon { width: 34px; height: 34px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 11px; background: #eeeefe; color: var(--site-primary); }
+    .activity-icon.green { background: #e7f8f2; color: #159a82; }
+    .activity-icon.orange { background: #fff4e3; color: #c58725; }
+    .activity-icon svg { width: 16px; height: 16px; }
+    .activity-body { flex: 1; min-width: 0; font-size: 11px; color: #626981; line-height: 1.65; }
+    .activity-body strong { color: #33384f; }
+    .activity-body a { color: var(--site-primary); font-weight: 700; }
+    .activity-time { color: #9ca1b3; font-size: 9px; margin-top: 5px; }
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); border-left: 1px solid var(--line); border-top: 1px solid var(--line); background: white; border-radius: 12px; overflow: hidden; }
+    .calendar-day-head { padding: 12px 5px; text-align: center; background: #fafbfe; color: #8d93a8; font-size: 9px; font-weight: 800; }
+    .calendar-cell { min-height: 108px; padding: 9px 7px; border-top: 1px solid var(--line); border-right: 1px solid var(--line); color: #555b73; font-size: 10px; }
+    .calendar-cell.today { background: #f5f5ff; }
+    .calendar-cell .day-no { display: block; margin-bottom: 9px; font-size: 10px; }
+    .calendar-event { display: block; padding: 5px 6px; margin-bottom: 4px; border-radius: 5px; background: #eeeefe; color: #5a5cc4; font-size: 8px; line-height: 1.35; font-weight: 700; cursor: pointer; }
+    .calendar-event.teal { background: #e4f8f3; color: #138671; }
+    .calendar-event.amber { background: #fff2df; color: #bd7d20; }
+    .settings-grid { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.3fr); gap: 18px; }
+    .settings-nav, .settings-panel { background: white; border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+    .settings-nav button { display: flex; width: 100%; text-align: left; gap: 10px; align-items: center; padding: 12px; border: 0; background: transparent; color: #767d94; border-radius: 8px; font-size: 11px; margin-top: 4px; }
+    .settings-nav button.active { background: #f0f0ff; color: var(--site-primary); font-weight: 800; }
+    .settings-nav svg { width: 16px; height: 16px; }
+    .settings-panel h2 { font-size: 15px; margin: 0 0 6px; color: var(--ink); }
+    .settings-panel > p { font-size: 10px; line-height: 1.6; color: var(--muted); margin: 0 0 22px; }
+    .field { display: grid; gap: 7px; margin-bottom: 16px; }
+    .field label { color: #656b82; font-size: 10px; font-weight: 800; }
+    .field input, .field select, .field textarea { width: 100%; border: 1px solid #e6e8f0; border-radius: 8px; padding: 11px 12px; color: #40465e; background: #fff; font-size: 11px; outline: none; }
+    .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 14px 0; border-top: 1px solid #f0f1f6; }
+    .setting-row strong { display: block; color: #4b5068; font-size: 11px; }
+    .setting-row small { display: block; color: #969caf; font-size: 9px; margin-top: 4px; }
+    .switch { position: relative; display: inline-block; width: 37px; height: 21px; flex: 0 0 auto; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .switch span { position: absolute; inset: 0; background: #d9dce8; border-radius: 25px; transition: .2s; cursor: pointer; }
+    .switch span:before { content: ""; position: absolute; width: 15px; height: 15px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: .2s; box-shadow: 0 1px 3px rgba(0,0,0,.14); }
+    .switch input:checked + span { background: var(--site-primary); }
+    .switch input:checked + span:before { transform: translateX(16px); }
+    .landing { display: none; min-height: 100vh; width: 100%; background: #f7f8fc; }
+    .landing.show { display: block; }
+    .landing-nav { display: flex; align-items: center; justify-content: space-between; max-width: 1180px; margin: 0 auto; padding: 23px 28px; }
+    .landing-nav .brand { color: var(--ink); padding: 0; }
+    .landing-nav .brand-mark { color: white; }
+    .landing-links { display: flex; gap: 27px; color: #777e96; font-size: 11px; align-items: center; }
+    .landing-links a:hover { color: var(--site-primary); }
+    .landing-hero { max-width: 1180px; margin: 0 auto; padding: 76px 28px 65px; display: grid; grid-template-columns: 1fr 1fr; gap: 55px; align-items: center; }
+    .landing-hero h1 { font-size: clamp(42px, 5vw, 65px); line-height: 1.04; letter-spacing: -3.3px; max-width: 580px; margin-bottom: 23px; }
+    .landing-hero h1 em { color: var(--site-primary); font-style: normal; }
+    .landing-hero .subheading { font-size: 14px; max-width: 470px; line-height: 1.8; margin: 0 0 25px; }
+    .hero-buttons { display: flex; gap: 10px; align-items: center; }
+    .hero-note { margin-top: 23px; color: #8b91a6; font-size: 10px; }
+    .hero-visual { background: linear-gradient(135deg,#252a49,#191d33); border-radius: 24px; padding: 20px; box-shadow: 0 28px 60px rgba(29,33,61,.2); position: relative; overflow: hidden; }
+    .hero-visual::before { content: ""; position: absolute; width: 250px; height: 250px; border-radius: 50%; background: rgba(22,169,148,.22); right: -100px; top: -140px; filter: blur(2px); opacity: var(--site-decoration-opacity); }
+    .mock-window { position: relative; z-index: 1; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 28px rgba(0,0,0,.15); }
+    .mock-top { height: 35px; background: #fbfbfe; border-bottom: 1px solid #eef0f6; display: flex; align-items: center; gap: 5px; padding: 0 12px; }
+    .mock-top span { width: 6px; height: 6px; background: #dddfea; border-radius: 50%; }
+    .mock-content { padding: 19px; }
+    .mock-title { color: #282d45; font-size: 13px; font-weight: 800; margin-bottom: 15px; }
+    .mock-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+    .mock-stat { border: 1px solid #edf0f6; border-radius: 8px; padding: 11px; }
+    .mock-stat small { color: #9096ab; font-size: 8px; display: block; }
+    .mock-stat b { color: #2e344d; font-size: 19px; display: block; margin-top: 7px; }
+    .mock-chart { display: flex; align-items: flex-end; gap: 7px; height: 90px; margin-top: 20px; padding: 0 10px 3px; border-bottom: 1px solid #e9ebf3; }
+    .mock-chart i { flex: 1; max-width: 30px; border-radius: 4px 4px 0 0; background: #bdbdff; }
+    .mock-chart i:nth-child(3n) { background: var(--site-secondary); }
+    .landing-features { max-width: 1180px; padding: 0 28px 75px; margin: 0 auto; }
+    .feature-heading { text-align: center; margin-bottom: 28px; }
+    .feature-heading h2 { color: var(--ink); font-size: calc(28px * var(--site-heading-scale)); letter-spacing: -1px; margin: 0; }
+    .feature-heading p { color: var(--muted); font-size: 12px; margin-top: 9px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 15px; }
+    .feature-card { background: white; border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+    .feature-card .metric-icon { margin-bottom: 16px; }
+    .feature-card h3 { color: var(--ink); font-size: 13px; margin: 0 0 9px; }
+    .feature-card p { color: var(--muted); font-size: 11px; line-height: 1.8; margin: 0; }
+    .landing-footer { padding: 23px 28px; text-align: center; color: #9399ae; border-top: 1px solid var(--line); font-size: 10px; }
+    .modal-backdrop { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(18,21,41,.48); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 20px; }
+    .modal-backdrop.open { display: flex; }
+    .modal { width: min(100%, 490px); max-height: min(90vh, 720px); overflow: auto; background: white; border-radius: 17px; padding: 25px; box-shadow: 0 25px 80px rgba(15,18,43,.25); animation: rise .18s ease-out; }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+    .modal h2 { color: var(--ink); font-size: 18px; margin: 0; letter-spacing: -.5px; }
+    .modal-head p { color: var(--muted); font-size: 10px; margin: 7px 0 0; }
+    .close-modal { width: 30px; height: 30px; border: 0; border-radius: 8px; color: #8b90a5; background: #f5f6fa; font-size: 19px; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding-top: 6px; }
+    .toast-region { position: fixed; right: 22px; bottom: 22px; z-index: 120; display: grid; gap: 8px; pointer-events: none; }
+    .toast { min-width: 235px; max-width: 360px; border-radius: 11px; padding: 13px 15px; background: #202640; color: white; box-shadow: 0 12px 32px rgba(24,29,55,.24); display: flex; align-items: center; gap: 10px; font-size: 11px; animation: rise .2s ease-out; }
+    .toast-mark { width: 22px; height: 22px; display: grid; place-items: center; background: rgba(22,169,148,.2); color: #76e1cd; border-radius: 7px; font-weight: 900; }
+    .toast strong { display: block; font-size: 11px; margin-bottom: 3px; }
+    .toast small { color: #b3bad0; font-size: 9px; }
+    .mobile-overlay { display: none; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
+    @media (max-width: 1150px) {
+      .content { padding: 27px 23px 42px; }
+      .topbar { padding: 0 23px; }
+      .sidebar { width: 220px; }
+      .main-shell { margin-left: 220px; width: calc(100% - 220px); }
+      .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .projects-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 850px) {
+      .sidebar { transform: translateX(-100%); transition: transform .22s ease; width: 255px; box-shadow: 15px 0 35px rgba(12,15,35,.17); }
+      .sidebar.open { transform: translateX(0); }
+      .mobile-overlay.show { display: block; position: fixed; inset: 0; z-index: 15; background: rgba(17,20,41,.35); }
+      .main-shell { margin-left: 0; width: 100%; }
+      .mobile-menu { display: grid; }
+      .topbar { padding: 0 20px; height: 68px; }
+      .content { padding: 25px 20px 36px; }
+      .dashboard-grid, .lower-grid { grid-template-columns: 1fr; }
+      .goal-card { min-height: 260px; }
+      .landing-hero { grid-template-columns: 1fr; padding-top: 45px; gap: 35px; }
+      .landing-hero h1 { max-width: 700px; }
+      .hero-visual { max-width: 560px; width: 100%; }
+    }
+    @media (max-width: 580px) {
+      .topbar { gap: 10px; padding: 0 13px; }
+      .crumb { display: none; }
+      .top-actions { margin-left: auto; gap: 8px; }
+      .searchbox { width: min(54vw, 245px); }
+      .kbd { display: none; }
+      .content { padding: 22px 13px 28px; }
+      .page-heading { align-items: flex-start; flex-direction: column; margin-bottom: 19px; gap: 14px; }
+      h1 { font-size: calc(24px * var(--site-heading-scale)); }
+      .heading-actions { width: 100%; }
+      .heading-actions .btn { flex: 1; }
+      .metric-grid { gap: 9px; }
+      .metric-card { padding: 13px; min-height: 123px; }
+      .metric-number { font-size: 25px; }
+      .metric-top { font-size: 10px; gap: 5px; }
+      .metric-icon { width: 27px; height: 27px; }
+      .panel-head { padding: 16px 14px 13px; }
+      .chart-wrap { padding: 4px 12px 12px; }
+      .project-row { grid-template-columns: minmax(0,1fr) 70px; padding: 13px; gap: 8px; }
+      .project-row .status { display: none; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .table-panel { overflow-x: auto; }
+      .data-table { min-width: 630px; }
+      .calendar-grid { overflow-x: auto; grid-template-columns: repeat(7,minmax(82px,1fr)); }
+      .calendar-cell { min-height: 92px; }
+      .settings-grid { grid-template-columns: 1fr; }
+      .lower-grid { gap: 13px; }
+      .dashboard-grid { gap: 13px; }
+      .searchbox input { height: 35px; }
+      .top-icon { width: 34px; height: 34px; }
+      .landing-nav { padding: 17px 18px; }
+      .landing-links { gap: 12px; font-size: 10px; }
+      .landing-links a:not(.btn) { display: none; }
+      .landing-hero { padding: 38px 18px 46px; }
+      .landing-hero h1 { font-size: 43px; letter-spacing: -2.3px; }
+      .landing-hero .subheading { font-size: 12px; }
+      .hero-visual { padding: 11px; border-radius: 17px; }
+      .mock-content { padding: 12px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .landing-features { padding: 0 18px 45px; }
+      .feature-heading h2 { font-size: 23px; }
+      .modal { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+      <button class="brand" id="brandHome" aria-label="Go to overview" style="border:0;background:none;text-align:left;cursor:pointer;">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 7.5 12 4l7 3.5v9L12 20l-7-3.5v-9Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/><path d="m8.5 12 2.2 2.2 4.8-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span>DevTrack<span style="color:#8788ff">.</span></span>
+      </button>
+      <div class="workspace-label">Workspace</div>
+      <nav class="nav-list" aria-label="Workspace pages">
+        <button class="nav-button active" data-page="overview"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="3.5" width="7" height="7" rx="1.8" stroke="currentColor" stroke-width="1.7"/><rect x="13.5" y="3.5" width="7" height="4.5" rx="1.6" stroke="currentColor" stroke-width="1.7"/><rect x="13.5" y="11" width="7" height="9.5" rx="1.8" stroke="currentColor" stroke-width="1.7"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8" stroke="currentColor" stroke-width="1.7"/></svg>Overview</button>
+        <button class="nav-button" data-page="projects"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 7.5A2.5 2.5 0 0 1 6 5h4l2 2h6a2.5 2.5 0 0 1 2.5 2.5v8A2.5 2.5 0 0 1 18 20H6a2.5 2.5 0 0 1-2.5-2.5v-10Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M3.8 10h16.4" stroke="currentColor" stroke-width="1.7"/></svg>Projects<span class="nav-count" id="projectCount">04</span></button>
+        <button class="nav-button" data-page="tasks"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.7"/><path d="m8 12 2.5 2.5L16 9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>My tasks<span class="nav-count" id="taskCount">06</span></button>
+        <button class="nav-button" data-page="calendar"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M7.5 3.5v3M16.5 3.5v3M4 9.5h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M8 13h2M14 13h2M8 16.5h2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>Calendar</button>
+        <button class="nav-button" data-page="activity"><svg viewBox="0 0 24 24" fill="none"><path d="M4 18V6M4 18h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="m7 14 3.4-3.5 3 2.2L19 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Activity</button>
+      </nav>
+      <div class="side-projects">
+        <div class="side-projects-head"><span>Your projects</span><button class="icon-small" id="sideAddProject" aria-label="Add project"><svg viewBox="0 0 24 24" width="15" height="15" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>
+        <div id="sideProjectList">
+          <button class="side-project" data-project="Pulse dashboard"><span class="project-dot" style="--dot:#7d7df3"></span>Pulse dashboard</button>
+          <button class="side-project" data-project="API redesign"><span class="project-dot" style="--dot:#18b69c"></span>API redesign</button>
+          <button class="side-project" data-project="Mobile onboarding"><span class="project-dot" style="--dot:#e5a74e"></span>Mobile onboarding</button>
+          <button class="side-project" data-project="Design system"><span class="project-dot" style="--dot:#d976a0"></span>Design system</button>
+        </div>
+      </div>
+      <div class="side-spacer"></div>
+      <div class="side-promo">
+        <div class="promo-spark"><svg viewBox="0 0 24 24" width="16" height="16" fill="none"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z" fill="currentColor"/></svg></div>
+        <strong>Make progress visible</strong><p>Small steps, clear priorities, stronger shipping habits.</p><button class="promo-link" id="learnMore">Explore DevTrack →</button>
+      </div>
+      <div class="user-mini"><div class="avatar" id="sidebarAvatar">EM</div><div><strong id="sidebarName">Emmy1-tech</strong><small>Personal workspace</small></div><button class="icon-small user-more" data-page="settings" aria-label="Open settings"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></div>
+    </aside>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+    <div class="main-shell" id="mainShell">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px"><button class="top-icon mobile-menu" id="mobileMenu" aria-label="Open navigation"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><div class="crumb"><span>Workspace</span><span> / </span><strong id="crumbTitle">Overview</strong></div></div>
+        <div class="top-actions">
+          <label class="searchbox"><svg viewBox="0 0 24 24" fill="none"><circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><input id="globalSearch" type="search" placeholder="Search anything..." aria-label="Search projects and tasks"><span class="kbd">⌘ K</span></label>
+          <button class="top-icon" id="notificationsBtn" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="notify-dot"></span></button>
+          <button class="top-icon" id="landingBtn" aria-label="View product landing page" title="View product landing page"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5h16v13H4zM8 9h8M8 12.5h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </header>
+      <main class="content">
+        <section class="page-view" id="page-overview" data-view="overview">
+          <div class="page-heading"><div><p class="eyebrow">Your developer workspace</p><h1>Good evening, Emmy <span aria-hidden="true">✦</span></h1><p class="subheading">Here’s what’s happening across your workspace today.</p></div><div class="heading-actions"><button class="btn" id="exportReport"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Export report</button><button class="btn btn-primary" id="newTaskTop"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>New task</button></div></div>
+          <div id="workspaceNotice" style="background:#f5f3ff;border:1px solid #e6e1fa;color:#68618a;padding:12px 16px;border-radius:12px;font-size:12px;line-height:1.6;margin-bottom:18px">Sample workspace · Demo data only. Do not enter sensitive information.</div><div class="metric-grid" id="metricGrid">
+            <article class="metric-card"><div class="metric-top"><span>Active projects</span><span class="metric-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 7.5A2.5 2.5 0 0 1 6 5h4l2 2h6a2.5 2.5 0 0 1 2.5 2.5v8A2.5 2.5 0 0 1 18 20H6a2.5 2.5 0 0 1-2.5-2.5v-10Z" stroke="currentColor" stroke-width="1.7"/></svg></span></div><div class="metric-number" id="metricProjects">04</div><div class="metric-foot"><span>Active projects in this session</span></div></article>
+            <article class="metric-card"><div class="metric-top"><span>Tasks completed</span><span class="metric-icon green"><svg viewBox="0 0 24 24" fill="none"><path d="m5 12 4.2 4.2L19 6.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div class="metric-number" id="metricCompleted">28</div><div class="metric-foot"><span>Completed tasks in this workspace</span></div></article>
+            <article class="metric-card"><div class="metric-top"><span>Due this week</span><span class="metric-icon amber"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.7"/><path d="M12 7v5l3.3 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span></div><div class="metric-number" id="metricDue">08</div><div class="metric-foot"><span>Open tasks due within 7 days</span></div></article>
+            <article class="metric-card"><div class="metric-top"><span>Completion rate</span><span class="metric-icon rose"><svg viewBox="0 0 24 24" fill="none"><path d="m4 16 5-5 3.5 2.5L19.5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.5 6h5v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div class="metric-number" id="metricRate">0%</div><div class="metric-foot">Completed tasks / all tasks</div></article>
+          </div>
+          <div class="dashboard-grid">
+            <section class="panel"><div class="panel-head"><div><div class="panel-title">Delivery overview</div><div class="panel-subtitle">Tasks completed vs. created · last 7 days</div></div><div class="chart-legend"><span class="legend-key"><i class="legend-dot"></i>Completed</span><span class="legend-key"><i class="legend-dot teal"></i>Created</span></div></div>
+              <div class="chart-wrap" id="deliverySummary" style="padding:6px 10px"></div>
+            </section>
+            <section class="panel goal-card"><div class="goal-head"><div><div class="panel-title">Workspace progress</div><div class="panel-subtitle">Calculated from task statuses</div></div><span class="goal-tag">CURRENT</span></div><div class="goal-content"><div class="goal-number" id="goalNumber">0%</div><div class="progress-track"><span id="goalProgress" style="width:0%"></span></div><div class="goal-foot"><span id="goalCount">0 tasks complete</span><strong id="goalRemaining">0 remaining</strong></div><div class="goal-divider"></div><div class="goal-milestone"><div class="milestone-icon">✓</div><div><strong>Make the next task count</strong><small>Progress updates as you work</small></div></div></div></section>
+          </div>
+          <div class="lower-grid">
+            <section class="panel"><div class="panel-head"><div><div class="panel-title">Your projects</div><div class="panel-subtitle">A snapshot of what your team is building</div></div><button class="text-link" data-goto="projects">View all projects <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="project-list" id="overviewProjectList"></div></section>
+            <section class="panel"><div class="panel-head"><div><div class="panel-title">Your priority tasks</div><div class="panel-subtitle">Keep the next steps moving</div></div><button class="text-link" data-goto="tasks">View all <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="task-list" id="overviewTaskList"></div></section>
+          </div>
+        </section>
+        <section class="page-view" id="page-projects" data-view="projects" hidden>
+          <div class="page-heading"><div><p class="eyebrow">Organize your work</p><h1>Projects</h1><p class="subheading">Keep every initiative moving in the right direction.</p></div><div class="heading-actions"><button class="btn" id="projectSort"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M7 12h10m-7 5h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>Sort by progress</button><button class="btn btn-primary" id="newProjectTop"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>New project</button></div></div>
+          <div class="page-toolbar"><div class="filter-pills" id="projectFilters"><button class="filter-pill active" data-filter="all">All projects</button><button class="filter-pill" data-filter="In progress">In progress</button><button class="filter-pill" data-filter="Planning">Planning</button><button class="filter-pill" data-filter="Completed">Completed</button></div><div style="color:#969caf;font-size:10px" id="projectResultCount">4 projects</div></div>
+          <div class="projects-grid" id="projectsGrid"></div>
+        </section>
+        <section class="page-view" id="page-tasks" data-view="tasks" hidden>
+          <div class="page-heading"><div><p class="eyebrow">Make the next step count</p><h1>My tasks</h1><p class="subheading">One clear action at a time. Track the work that moves things forward.</p></div><div class="heading-actions"><button class="btn" id="taskClearFilters">Reset filters</button><button class="btn btn-primary" id="newTaskPage"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>New task</button></div></div>
+          <div class="page-toolbar"><div class="filter-pills" id="taskFilters"><button class="filter-pill active" data-filter="all">All tasks</button><button class="filter-pill" data-filter="Todo">To do</button><button class="filter-pill" data-filter="In progress">In progress</button><button class="filter-pill" data-filter="Done">Completed</button></div><div style="color:#969caf;font-size:10px" id="taskResultCount">6 tasks</div></div>
+          <div class="table-panel"><table class="data-table"><thead><tr><th>Task</th><th>Project</th><th>Priority</th><th>Status</th><th>Due date</th><th></th></tr></thead><tbody id="tasksTableBody"></tbody></table></div>
+        </section>
+        <section class="page-view" id="page-calendar" data-view="calendar" hidden>
+          <div class="page-heading"><div><p class="eyebrow">Plan the week</p><h1>Calendar</h1><p class="subheading">See deadlines and milestones in one simple view.</p></div><div class="heading-actions"><button class="btn" id="prevWeek">← Previous</button><button class="btn" id="thisWeek">This week</button><button class="btn" id="nextWeek">Next →</button></div></div>
+          <div class="panel" style="padding:16px;margin-bottom:17px"><div class="panel-head" style="padding:0 0 14px"><div><div class="panel-title" id="calendarTitle">October 26 – November 1, 2026</div><div class="panel-subtitle">Your deadlines and planned work</div></div><button class="btn btn-primary" id="calendarAddTask">+ Add task</button></div><div class="calendar-grid" id="calendarGrid"></div></div>
+          <div style="display:flex;gap:15px;flex-wrap:wrap;color:#878da2;font-size:10px"><span class="legend-key"><i class="legend-dot"></i>Project milestone</span><span class="legend-key"><i class="legend-dot teal"></i>Task due</span><span class="legend-key"><i style="width:7px;height:7px;border-radius:3px;background:#e5a74e"></i>Review</span></div>
+        </section>
+        <section class="page-view" id="page-activity" data-view="activity" hidden>
+          <div class="page-heading"><div><p class="eyebrow">Stay in the loop</p><h1>Activity</h1><p class="subheading">A timeline of the small wins and changes across your workspace.</p></div><div class="heading-actions"><button class="btn" id="activityMarkRead">Mark all as read</button></div></div>
+          <div class="page-toolbar"><div class="filter-pills" id="activityFilters"><button class="filter-pill active" data-filter="all">All activity</button><button class="filter-pill" data-filter="task">Tasks</button><button class="filter-pill" data-filter="project">Projects</button><button class="filter-pill" data-filter="milestone">Milestones</button></div></div>
+          <div class="activity-feed" id="activityFeed"></div>
+        </section>
+        <section class="page-view" id="page-settings" data-view="settings" hidden>
+          <div class="page-heading"><div><p class="eyebrow">Make it yours</p><h1>Settings</h1><p class="subheading">Manage your workspace preferences and profile details.</p></div></div>
+          <div class="settings-grid"><div class="settings-nav"><div class="panel-title" style="margin:0 0 12px 12px">Preferences</div><button class="active"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M5 20c.5-3.4 2.8-5.2 7-5.2s6.5 1.8 7 5.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Profile settings</button><button id="settingsNotifications"><svg viewBox="0 0 24 24" fill="none"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Notifications</button><button id="settingsWorkspace"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4" width="17" height="16" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9h17M8 4v5" stroke="currentColor" stroke-width="1.6"/></svg>Workspace</button></div>
+            <div class="settings-panel"><h2>Profile settings</h2><p>Update how your name and account details appear in DevTrack.</p><form id="profileForm"><div class="field"><label for="profileName">Display name</label><input id="profileName" name="profileName" value="Emmy1-tech" required maxlength="60"></div><div class="field"><label for="profileRole">What best describes you?</label><select id="profileRole" name="profileRole"><option>Software developer</option><option>Frontend developer</option><option>Full-stack developer</option><option>Student developer</option><option>Engineering team lead</option></select></div><div class="field"><label for="profileBio">Short bio</label><textarea id="profileBio" name="profileBio" rows="3" maxlength="180" placeholder="Building thoughtful software, one commit at a time."></textarea></div><button class="btn btn-primary" type="submit">Save changes</button></form><div style="margin-top:24px"><div class="panel-title">Workspace preferences</div><div class="setting-row"><div><strong>Task reminders</strong><small>Show a reminder for tasks nearing their due date</small></div><label class="switch"><input type="checkbox" id="remindersSwitch" checked><span></span></label></div><div class="setting-row"><div><strong>Weekly progress summary</strong><small>Include a weekly overview in your workspace</small></div><label class="switch"><input type="checkbox" id="summarySwitch" checked><span></span></label></div><div class="setting-row"><div><strong>Product update notifications</strong><small>Keep me informed about new workspace features</small></div><label class="switch"><input type="checkbox" id="updatesSwitch"><span></span></label></div></div></div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <section class="landing" id="landingPage" aria-label="DevTrack product overview">
+      <header class="landing-nav"><button class="brand" id="landingBrand" style="border:0;background:none;cursor:pointer"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 7.5 12 4l7 3.5v9L12 20l-7-3.5v-9Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/><path d="m8.5 12 2.2 2.2 4.8-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>DevTrack<span style="color:#8788ff">.</span></span></button><nav class="landing-links"><a href="#features">Features</a><a href="#how-it-works">How it works</a><button class="btn btn-primary" id="openWorkspaceFromLanding">Open workspace →</button></nav></header>
+      <div class="landing-hero"><div><p class="eyebrow">A calmer way to ship software</p><h1>Less chasing tasks.<br><em>More building</em> things.</h1><p class="subheading">DevTrack gives developers a clear home for projects, priorities, and progress. Know what matters today, and see how every small win adds up.</p><div class="hero-buttons"><button class="btn btn-primary" id="heroOpenApp">Explore the workspace <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a class="btn" href="#features">See what you can do</a></div><div class="hero-note">Designed for focused work · Built for real-world projects</div></div><div class="hero-visual"><div class="mock-window"><div class="mock-top"><span></span><span></span><span></span><div style="margin-left:auto;font-size:8px;color:#999eb2">devtrack / overview</div></div><div class="mock-content"><div class="mock-title">Workspace at a glance</div><div class="mock-stats"><div class="mock-stat"><small>Active projects</small><b>04</b></div><div class="mock-stat"><small>Tasks completed</small><b>28</b></div><div class="mock-stat"><small>Team velocity</small><b>86<span style="font-size:9px;color:#9499ad">/100</span></b></div></div><div style="display:flex;justify-content:space-between;margin-top:19px;font-size:9px;color:#888ea4"><span>Delivery overview</span><span>Last 7 days</span></div><div class="mock-chart"><i style="height:52%"></i><i style="height:40%"></i><i style="height:70%"></i><i style="height:56%"></i><i style="height:47%"></i><i style="height:85%"></i><i style="height:67%"></i><i style="height:94%"></i><i style="height:75%"></i><i style="height:80%"></i></div></div></div></div></div>
+      <section class="landing-features" id="features"><div class="feature-heading"><p class="eyebrow">Everything in one place</p><h2>Built around how developers work</h2><p>A simple system for planning work, keeping momentum, and learning from progress.</p></div><div class="feature-grid"><article class="feature-card"><div class="metric-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 7.5A2.5 2.5 0 0 1 6 5h4l2 2h6a2.5 2.5 0 0 1 2.5 2.5v8A2.5 2.5 0 0 1 18 20H6a2.5 2.5 0 0 1-2.5-2.5v-10Z" stroke="currentColor" stroke-width="1.7"/></svg></div><h3>Project clarity</h3><p>Keep the scope, status, and progress of each initiative visible in a single workspace.</p></article><article class="feature-card"><div class="metric-icon green"><svg viewBox="0 0 24 24" fill="none"><path d="M4 4h16v16H4z" stroke="currentColor" stroke-width="1.6"/><path d="m8 12 2.5 2.5L16.5 8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>Actionable task lists</h3><p>Break larger goals into clear next steps, add deadlines, and track work from start to done.</p></article><article class="feature-card" id="how-it-works"><div class="metric-icon amber"><svg viewBox="0 0 24 24" fill="none"><path d="M4 18V6M4 18h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="m7 14 3.4-3.5 3 2.2L19 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>Progress you can learn from</h3><p>Use activity history and delivery trends to spot bottlenecks and celebrate consistent progress.</p></article></div></section>
+      <footer class="landing-footer">DevTrack · A developer productivity project · Built to make good work easier to see.</footer>
+    </section>
+  </div>
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal"><div class="modal-head"><div><h2 id="modalTitle">Create a task</h2><p id="modalDescription">Break the next step into something actionable.</p></div><button class="close-modal" id="modalClose" aria-label="Close dialog">×</button></div><form id="modalForm"><div id="modalFields"></div><div class="modal-footer"><button class="btn" type="button" id="modalCancel">Cancel</button><button class="btn btn-primary" type="submit" id="modalSubmit">Create task</button></div></form></div></div>
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+  <script>
+    (() => {
+      const $ = (s, root = document) => root.querySelector(s);
+      const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+      const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+      const icon = {
+        code: '<svg viewBox="0 0 24 24" fill="none"><path d="m8 8-4 4 4 4M16 8l4 4-4 4m-2-10-4 12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        screen: '<svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4" width="17" height="13" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 21h8m-4-4v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
+        phone: '<svg viewBox="0 0 24 24" fill="none"><rect x="6.5" y="2.5" width="11" height="19" rx="2.2" stroke="currentColor" stroke-width="1.7"/><path d="M10 18.5h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
+        layers: '<svg viewBox="0 0 24 24" fill="none"><path d="m12 3 9 5-9 5-9-5 9-5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>',
+        arrow: '<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        check: '<svg viewBox="0 0 24 24" fill="none"><path d="m5 12 4.2 4.2L19 6.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        spark: '<svg viewBox="0 0 24 24" fill="none"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>'
+      };
+      let projects = [
+        { id: 1, name: 'Pulse dashboard', description: 'Build a real-time observability dashboard for service health and usage.', icon: 'screen', color: '', owner: 'Emmy1-tech', progress: 78, status: 'In progress', due: 'Oct 30, 2026', tasks: 14, done: 11, tone: 'purple' },
+        { id: 2, name: 'API redesign', description: 'Create a consistent, documented REST API with improved error handling.', icon: 'code', color: 'teal', owner: 'Emmy1-tech', progress: 56, status: 'In progress', due: 'Nov 04, 2026', tasks: 18, done: 10, tone: 'teal' },
+        { id: 3, name: 'Mobile onboarding', description: 'Make the first-run experience clearer, faster, and more welcoming.', icon: 'phone', color: 'orange', owner: 'Emmy1-tech', progress: 32, status: 'Planning', due: 'Nov 12, 2026', tasks: 9, done: 3, tone: 'orange' },
+        { id: 4, name: 'Design system', description: 'Document reusable components, design tokens, and accessibility rules.', icon: 'layers', color: 'pink', owner: 'Emmy1-tech', progress: 100, status: 'Completed', due: 'Oct 22, 2026', tasks: 12, done: 12, tone: 'pink' }
+      ];
+      let tasks = [
+        { id: 101, title: 'Add API response caching', projectId: 2, priority: 'High', status: 'In progress', due: 'Oct 27, 2026', assignee: 'Emmy1-tech' },
+        { id: 102, title: 'Review dashboard empty states', projectId: 1, priority: 'Medium', status: 'Todo', due: 'Oct 28, 2026', assignee: 'Emmy1-tech' },
+        { id: 103, title: 'Write endpoint validation tests', projectId: 2, priority: 'High', status: 'Todo', due: 'Oct 29, 2026', assignee: 'Emmy1-tech' },
+        { id: 104, title: 'Polish onboarding success screen', projectId: 3, priority: 'Low', status: 'In progress', due: 'Oct 30, 2026', assignee: 'Emmy1-tech' },
+        { id: 105, title: 'Document color and spacing tokens', projectId: 4, priority: 'Medium', status: 'Done', due: 'Oct 24, 2026', assignee: 'Emmy1-tech' },
+        { id: 106, title: 'Add keyboard navigation support', projectId: 1, priority: 'High', status: 'Todo', due: 'Oct 31, 2026', assignee: 'Emmy1-tech' }
+      ];
+      let activities = [
+        { type: 'task', icon: 'check', tone: 'green', who: 'Emmy1-tech', text: 'completed', target: 'Document color and spacing tokens', projectId: 4, time: 'Today, 4:42 PM' },
+        { type: 'project', icon: 'screen', tone: '', who: 'Emmy1-tech', text: 'updated the progress on', target: 'Pulse dashboard', projectId: 1, time: 'Today, 2:18 PM' },
+        { type: 'task', icon: 'code', tone: '', who: 'Emmy1-tech', text: 'moved a task to in progress:', target: 'Add API response caching', projectId: 2, time: 'Today, 11:06 AM' },
+        { type: 'milestone', icon: 'spark', tone: 'orange', who: 'DevTrack', text: 'is approaching the next milestone for', target: 'API redesign', projectId: 2, time: 'Yesterday, 3:30 PM' },
+        { type: 'project', icon: 'layers', tone: 'green', who: 'Emmy1-tech', text: 'marked the project as complete:', target: 'Design system', projectId: 4, time: 'Oct 22, 2026' },
+        { type: 'task', icon: 'check', tone: 'green', who: 'Emmy1-tech', text: 'completed', target: 'Set up component guidelines', projectId: 4, time: 'Oct 21, 2026' }
+      ];
+      let currentPage = 'overview';
+      let projectFilter = 'all';
+      let taskFilter = 'all';
+      let activityFilter = 'all';
+      let searchTerm = '';
+      let sortDescending = true;
+      let calendarOffset = 0;
+
+      let apiReady = false;
+      let saveQueue = Promise.resolve();
+      const refreshCounts = () => projects.forEach(p => {
+        const related = tasks.filter(t => String(t.projectId) === String(p.id));
+        p.tasks=related.length;p.done=related.filter(t=>t.status==='Done').length;
+        p.progress=p.tasks?Math.round(p.done/p.tasks*100):0;
+      });
+      const renderMeasured = () => {
+        refreshCounts();
+        const done=tasks.filter(t=>t.status==='Done').length;
+        const doing=tasks.filter(t=>t.status==='In progress').length;
+        const todo=tasks.filter(t=>t.status==='Todo').length;
+        const pct=tasks.length?Math.round(done/tasks.length*100):0;
+        $('#metricRate').textContent=pct+'%';
+        $('#goalNumber').textContent=pct+'%';
+        $('#goalProgress').style.width=pct+'%';
+        $('#goalCount').textContent=done+' of '+tasks.length+' tasks completed';
+        $('#goalRemaining').textContent=(tasks.length-done)+' remaining';
+        $('#deliverySummary').innerHTML=[['Completed',done],['In progress',doing],['To do',todo],['Total tasks',tasks.length]].map(([n,v])=>'<div style="display:flex;justify-content:space-between;padding:13px 3px;border-bottom:1px solid #eff0f5;font-size:12px;color:#7b8096"><span>'+n+'</span><strong style="font-size:13px;color:#383e56">'+v+'</strong></div>').join('');
+      };
+      const persistWorkspace = () => {
+        if (!apiReady) { toast('Offline preview','Changes cannot be saved until the API is available.');return; }
+        const body=JSON.stringify({projects,tasks,activities,profile:{name:$('#sidebarName').textContent},isDemo:false});
+        saveQueue=saveQueue.catch(()=>{}).then(async()=>{
+          const response=await fetch('/api/workspace',{method:'PUT',headers:{'Content-Type':'application/json'},body});
+          if(!response.ok)throw Error('Save failed ('+response.status+')');
+          $('#workspaceNotice').textContent='Your session workspace · Data is saved on the demo server while this browser session exists. Do not enter sensitive information.';
+        }).catch(e=>toast('Could not save',e.message));
+      };
+      const initialize=async()=>{
+        try {
+          const response=await fetch('/api/workspace');
+          if(!response.ok)throw Error('Server unavailable');
+          const data=await response.json();
+          projects=data.projects;tasks=data.tasks;activities=data.activities;
+          const name=data.profile?.name||'Emmy1-tech';
+          $('#sidebarName').textContent=name;$('#sidebarAvatar').textContent=initials(name);$('#profileName').value=name;
+          $('#workspaceNotice').textContent=data.isDemo?'Sample workspace · All projects and activity are illustrative. Changes are saved separately for this browser session. Do not enter sensitive information.':'Your session workspace · Changes save to the demo server. Do not enter sensitive information.';
+          apiReady=true;
+        } catch (_) { $('#workspaceNotice').textContent='Offline preview with sample data · The server is unavailable, so changes will not be saved.'; }
+        refreshCounts();renderOverview();
+      };
+      const pageTitles = {overview:'Overview', projects:'Projects', tasks:'My tasks', calendar:'Calendar', activity:'Activity', settings:'Settings'};
+      const projectById = id => projects.find(p => String(p.id) === String(id));
+      const projectName = id => projectById(id)?.name || 'Unassigned';
+      const initials = name => name.split(/\s+/).map(part => part[0] || '').slice(0,2).join('').toUpperCase();
+      const toneForStatus = status => status === 'Completed' ? 'on-track' : status === 'Planning' ? 'planning' : status === 'In progress' ? 'review' : 'planning';
+      const statusLabel = status => status === 'Completed' ? 'Completed' : status === 'Planning' ? 'Planning' : status === 'In progress' ? 'In progress' : status;
+      const setPage = page => {
+        if (!pageTitles[page]) return;
+        currentPage = page;
+        $$('.page-view').forEach(view => view.hidden = view.dataset.view !== page);
+        $$('.nav-button[data-page]').forEach(btn => btn.classList.toggle('active', btn.dataset.page === page));
+        $('#crumbTitle').textContent = pageTitles[page];
+        closeSidebar();
+        if (page === 'projects') renderProjects();
+        if (page === 'tasks') renderTasks();
+        if (page === 'calendar') renderCalendar();
+        if (page === 'activity') renderActivity();
+        window.scrollTo({top:0, behavior:'smooth'});
+      };
+      const toast = (title, message = '') => {
+        const item = document.createElement('div');
+        item.className = 'toast';
+        item.innerHTML = `<span class="toast-mark">✓</span><span><strong>${esc(title)}</strong>${message ? `<small>${esc(message)}</small>` : ''}</span>`;
+        $('#toastRegion').append(item);
+        setTimeout(() => { item.style.opacity = '0'; item.style.transform = 'translateY(5px)'; setTimeout(() => item.remove(), 220); }, 3200);
+      };
+      const showLanding = show => {
+        $('#landingPage').classList.toggle('show', show);
+        $('#mainShell').style.display = show ? 'none' : '';
+        $('#sidebar').style.display = show ? 'none' : '';
+        $('#mobileOverlay').classList.remove('show');
+        window.scrollTo({top:0,behavior:'smooth'});
+      };
+      const closeSidebar = () => { $('#sidebar').classList.remove('open'); $('#mobileOverlay').classList.remove('show'); };
+      const renderSideProjects = () => {
+        $('#sideProjectList').innerHTML = projects.map((p,i) => `<button class="side-project" data-project-id="${p.id}"><span class="project-dot" style="--dot:${['#7d7df3','#18b69c','#e5a74e','#d976a0'][i%4]}"></span>${esc(p.name)}</button>`).join('');
+        $('#projectCount').textContent = String(projects.length).padStart(2,'0');
+        $('#metricProjects').textContent = String(projects.filter(p=>p.status!=='Completed').length).padStart(2,'0');
+      };
+      const renderOverviewProjects = () => {
+        const visible = projects.filter(p => p.name.toLowerCase().includes(searchTerm));
+        $('#overviewProjectList').innerHTML = visible.slice(0,4).map(p => `<div class="project-row" data-open-project="${p.id}" role="button" tabindex="0"><div class="project-id"><div class="project-icon ${esc(p.color)}">${icon[p.icon] || icon.code}</div><div style="min-width:0;flex:1"><div class="project-name">${esc(p.name)}</div><div class="project-owner">${p.done} of ${p.tasks} tasks completed</div><div class="mini-progress"><span style="width:${p.progress}%;background:${p.color==='teal'?'var(--site-secondary)':p.color==='orange'?'#e7aa4e':p.color==='pink'?'#d976a0':'var(--site-primary)'}"></span></div></div></div><div><div class="project-percent">${p.progress}%</div><div class="project-owner">Progress</div></div><span class="status ${toneForStatus(p.status)}">${esc(statusLabel(p.status))}</span></div>`).join('') || `<div class="empty-state">No projects match your search.</div>`;
+        $('#overviewProjectList').querySelectorAll('[data-open-project]').forEach(el => { el.addEventListener('click', () => showProjectDetail(el.dataset.openProject)); el.addEventListener('keydown', e => { if(e.key==='Enter') showProjectDetail(el.dataset.openProject); }); });
+      };
+      const renderOverviewTasks = () => {
+        const visible = tasks.filter(t => t.status !== 'Done' && `${t.title} ${projectName(t.projectId)}`.toLowerCase().includes(searchTerm));
+        $('#overviewTaskList').innerHTML = visible.slice(0,4).map(t => `<div class="task-row"><input class="task-check" type="checkbox" data-complete-task="${t.id}" aria-label="Complete ${esc(t.title)}" ${t.status==='Done'?'checked':''}><div class="task-copy"><strong>${esc(t.title)}</strong><small>${esc(projectName(t.projectId))} · Due ${esc(shortDate(t.due))}</small></div><span class="task-priority priority-${t.priority.toLowerCase()}">${esc(t.priority)}</span></div>`).join('') || `<div class="empty-state">No open tasks found. Add a task to get moving.</div>`;
+        $('#overviewTaskList').querySelectorAll('[data-complete-task]').forEach(el => el.addEventListener('change', () => completeTask(el.dataset.completeTask, el.checked)));
+        $('#metricCompleted').textContent = String(tasks.filter(t=>t.status==='Done').length).padStart(2,'0');
+        $('#metricDue').textContent = String(tasks.filter(t=>t.status!=='Done'&&t.due&&new Date(t.due)>=new Date(new Date().toDateString())&&new Date(t.due)<new Date(Date.now()+604800000)).length).padStart(2,'0');
+        $('#taskCount').textContent = String(tasks.filter(t=>t.status!=='Done').length).padStart(2,'0');
+      };
+      const renderOverview = () => { renderMeasured(); renderSideProjects(); renderOverviewProjects(); renderOverviewTasks(); };
+      const renderProjects = () => {
+        let visible = projects.filter(p => (projectFilter==='all'||p.status===projectFilter) && `${p.name} ${p.description} ${p.status}`.toLowerCase().includes(searchTerm));
+        visible = [...visible].sort((a,b) => sortDescending ? b.progress-a.progress : a.progress-b.progress);
+        $('#projectsGrid').innerHTML = visible.map(p=>`<article class="project-card" data-open-project="${p.id}" tabindex="0" role="button" aria-label="Open ${esc(p.name)}"><div class="project-card-top"><div class="project-icon ${esc(p.color)}">${icon[p.icon] || icon.code}</div><span class="status ${toneForStatus(p.status)}">${esc(p.status)}</span></div><h3>${esc(p.name)}</h3><p>${esc(p.description)}</p><div style="margin-top:17px"><div style="display:flex;justify-content:space-between;color:#8b91a6;font-size:9px;margin-bottom:7px"><span>Progress</span><strong style="color:#626880">${p.progress}%</strong></div><div class="mini-progress"><span style="width:${p.progress}%;background:${p.color==='teal'?'var(--site-secondary)':p.color==='orange'?'#e7aa4e':p.color==='pink'?'#d976a0':'var(--site-primary)'}"></span></div></div><div class="card-meta"><span>${p.done}/${p.tasks} tasks · Due ${esc(shortDate(p.due))}</span><span class="avatars"><i class="avatar-stack">EM</i><i class="avatar-stack">+1</i></span></div></article>`).join('') || `<div class="empty-state" style="grid-column:1/-1">No projects match this filter. Create a new project to get started.</div>`;
+        $('#projectResultCount').textContent = `${visible.length} project${visible.length===1?'':'s'}`;
+        $('#projectsGrid').querySelectorAll('[data-open-project]').forEach(el=>{el.addEventListener('click',()=>showProjectDetail(el.dataset.openProject));el.addEventListener('keydown',e=>{if(e.key==='Enter')showProjectDetail(el.dataset.openProject);});});
+      };
+      const renderTasks = () => {
+        const visible = tasks.filter(t => (taskFilter==='all'||t.status===taskFilter) && `${t.title} ${projectName(t.projectId)} ${t.priority} ${t.status}`.toLowerCase().includes(searchTerm));
+        $('#tasksTableBody').innerHTML = visible.map(t=>`<tr><td class="task-title-cell">${t.status==='Done'?'✓ ':''}${esc(t.title)}</td><td>${esc(projectName(t.projectId))}</td><td><span class="task-label ${t.priority==='High'?'':' '+(t.priority==='Low'?'green':'orange')}">${esc(t.priority)}</span></td><td><span class="task-label ${t.status==='Done'?'green':t.status==='In progress'?'orange':''}">${esc(t.status==='Todo'?'To do':t.status)}</span></td><td>${esc(shortDate(t.due))}</td><td><button class="icon-small" style="color:#7e849a" data-toggle-task="${t.id}" aria-label="Toggle task completion">${t.status==='Done'?'↶':'✓'}</button></td></tr>`).join('') || `<tr><td colspan="6"><div class="empty-state">No tasks found for this filter.</div></td></tr>`;
+        $('#taskResultCount').textContent = `${visible.length} task${visible.length===1?'':'s'}`;
+        $('#tasksTableBody').querySelectorAll('[data-toggle-task]').forEach(el=>el.addEventListener('click',()=>{const t=tasks.find(x=>String(x.id)===String(el.dataset.toggleTask)); if(t) completeTask(t.id,t.status!=='Done');}));
+      };
+      const shortDate = value => { const d = new Date(`${value} 12:00:00`); if (Number.isNaN(d.getTime())) return value; return d.toLocaleDateString('en-CA',{month:'short',day:'numeric'}); };
+      const renderCalendar = () => {
+        const today=new Date(); const monday = new Date(today.getFullYear(),today.getMonth(),today.getDate()-((today.getDay()+6)%7)+calendarOffset*7); const sunday = new Date(monday); sunday.setDate(monday.getDate()+6);
+        $('#calendarTitle').textContent = `${monday.toLocaleDateString('en-US',{month:'long',day:'numeric'})} – ${sunday.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}`;
+        const events = [
+          {day:1,title:'Response caching',tone:'teal'}, {day:2,title:'Dashboard review',tone:'amber'}, {day:3,title:'Validation tests',tone:'teal'}, {day:4,title:'Beta milestone',tone:''}, {day:5,title:'Onboarding polish',tone:'teal'}, {day:6,title:'Accessibility QA',tone:'amber'}
+        ];
+        const cells = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((day,i)=>`<div class="calendar-day-head">${day}</div>`).join('') + Array.from({length:7},(_,i)=>{const d=new Date(monday);d.setDate(monday.getDate()+i);const dayNum=d.getDate(); const ev = calendarOffset===0 ? events.filter(e=>e.day===i) : (i===2&&calendarOffset>0?[{title:'Sprint planning',tone:''}]:[]);return `<div class="calendar-cell ${calendarOffset===0&&i===0?'today':''}"><span class="day-no">${dayNum}${calendarOffset===0&&i===0?' · Today':''}</span>${ev.map(e=>`<button class="calendar-event ${e.tone==='teal'?'teal':e.tone==='amber'?'amber':''}" data-calendar-event="${esc(e.title)}">${esc(e.title)}</button>`).join('')}</div>`;}).join('');
+        $('#calendarGrid').innerHTML = cells;
+        $('#calendarGrid').querySelectorAll('[data-calendar-event]').forEach(el=>el.addEventListener('click',()=>toast(el.dataset.calendarEvent,'Event details are part of this interactive demo.')));
+      };
+      const renderActivity = () => {
+        const visible = activities.filter(a=>(activityFilter==='all'||a.type===activityFilter)&&`${a.who} ${a.text} ${a.target}`.toLowerCase().includes(searchTerm));
+        $('#activityFeed').innerHTML = visible.map(a=>`<div class="activity-item"><div class="activity-icon ${esc(a.tone)}">${icon[a.icon]||icon.check}</div><div class="activity-body"><strong>${esc(a.who)}</strong> ${esc(a.text)} <a href="#" data-activity-project="${a.projectId}">${esc(a.target)}</a><div class="activity-time">${esc(a.time)}</div></div></div>`).join('') || `<div class="empty-state">No activity matches your search.</div>`;
+        $('#activityFeed').querySelectorAll('[data-activity-project]').forEach(el=>el.addEventListener('click',e=>{e.preventDefault();showProjectDetail(el.dataset.activityProject);}));
+      };
+      const addActivity = (type, text, target, projectId) => {
+        activities.unshift({type, icon:type==='project'?'screen':'check', tone:type==='project'?'':'green', who:$('#sidebarName').textContent, text, target, projectId, time:'Just now'});
+      };
+      const completeTask = (id, completed) => {
+        const task = tasks.find(t=>String(t.id)===String(id)); if(!task) return;
+        task.status = completed ? 'Done' : 'Todo';
+        if(completed){ const project=projectById(task.projectId); if(project){refreshCounts();if(project.progress===100&&project.tasks>0)project.status='Completed';} addActivity('task','completed',task.title,task.projectId);toast('Task completed',task.title); }
+        else { const project=projectById(task.projectId); if(project){refreshCounts();if(project.status==='Completed')project.status='In progress';} toast('Task reopened',task.title); }
+        renderOverview(); if(currentPage==='tasks')renderTasks(); if(currentPage==='projects')renderProjects(); if(currentPage==='activity')renderActivity(); if(currentPage==='calendar')renderCalendar();persistWorkspace();
+      };
+      const showProjectDetail = id => {
+        const project=projectById(id); if(!project){toast('Project not found','Try refreshing the project list.');return;}
+        const related=tasks.filter(t=>t.projectId===project.id);
+        openModal('Project details',`A closer look at ${project.name}.`, `<div class="field"><label>Project</label><input value="${esc(project.name)}" readonly></div><div class="field"><label>Description</label><textarea rows="3" readonly>${esc(project.description)}</textarea></div><div class="field"><label>Progress</label><div class="mini-progress"><span style="width:${project.progress}%"></span></div><div style="font-size:10px;color:#868ca2;margin-top:4px">${project.progress}% · ${project.done} of ${project.tasks} tasks completed</div></div><div class="field"><label>Project tasks</label><div style="display:grid;gap:7px">${related.map(t=>`<div style="display:flex;align-items:center;gap:8px;font-size:10px;color:#5d637b"><span style="color:${t.status==='Done'?'#139a83':'#a1a6b8'}">${t.status==='Done'?'✓':'○'}</span>${esc(t.title)}<span style="margin-left:auto;color:#989db0">${esc(t.status)}</span></div>`).join('')||'<div style="font-size:10px;color:#858ba2">No tasks linked to this project yet.</div>'}</div></div>`, 'Close', ()=>closeModal());
+      };
+      let modalSubmitHandler = null;
+      const openModal = (title, description, fieldsHtml, submitText='Create', handler=null) => {
+        $('#modalTitle').textContent=title; $('#modalDescription').textContent=description; $('#modalFields').innerHTML=fieldsHtml; $('#modalSubmit').textContent=submitText; $('#modalSubmit').style.display=handler?'':'none'; $('#modalForm').style.display=handler?'':'none'; $('#modalForm').dataset.mode=handler?'submit':'view'; modalSubmitHandler=handler; $('#modalBackdrop').classList.add('open'); setTimeout(()=>$('#modalFields input:not([readonly]),#modalFields textarea,#modalFields select')?.focus(),50);
+      };
+      const closeModal = () => { $('#modalBackdrop').classList.remove('open'); modalSubmitHandler=null; $('#modalForm').reset(); };
+      const openTaskModal = () => {
+        openModal('Create a task','Break the next step into something actionable.', `<div class="field"><label for="taskTitleInput">Task title *</label><input id="taskTitleInput" required maxlength="120" placeholder="e.g. Add API validation tests"></div><div class="field"><label for="taskProjectInput">Project</label><select id="taskProjectInput">${projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></div><div class="field"><label for="taskPriorityInput">Priority</label><select id="taskPriorityInput"><option>Medium</option><option>High</option><option>Low</option></select></div><div class="field"><label for="taskStatusInput">Status</label><select id="taskStatusInput"><option value="Todo">To do</option><option>In progress</option></select></div><div class="field"><label for="taskDueInput">Due date</label><input id="taskDueInput" type="date" value="2026-10-30"></div>`, 'Create task', form=>{
+          const title=$('#taskTitleInput').value.trim(); if(!title){$('#taskTitleInput').focus();return false;}
+          const dueValue=$('#taskDueInput').value; const due=dueValue||'';
+          const projectId=$('#taskProjectInput').value; const task={id:Date.now()+Math.floor(Math.random()*1000),title,projectId,priority:$('#taskPriorityInput').value,status:$('#taskStatusInput').value,due,assignee:$('#sidebarName').textContent}; tasks.unshift(task);const project=projectById(projectId);if(project)refreshCounts();
+          addActivity('task','created a task',title,projectId); closeModal();renderOverview();if(currentPage==='tasks')renderTasks();if(currentPage==='projects')renderProjects();if(currentPage==='calendar')renderCalendar();toast('Task created',title);persistWorkspace();return true;
+        });
+      };
+      const openProjectModal = () => {
+        openModal('Create a project','Give your next initiative a clear starting point.', `<div class="field"><label for="projectTitleInput">Project name *</label><input id="projectTitleInput" required maxlength="80" placeholder="e.g. Developer portal"></div><div class="field"><label for="projectDescriptionInput">Description</label><textarea id="projectDescriptionInput" rows="3" maxlength="240" placeholder="What are you building, and why?"></textarea></div><div class="field"><label for="projectDueInput">Target date</label><input id="projectDueInput" type="date" value="2026-11-20"></div><div class="field"><label for="projectStatusInput">Initial status</label><select id="projectStatusInput"><option>Planning</option><option>In progress</option></select></div>`, 'Create project', form=>{
+          const name=$('#projectTitleInput').value.trim(); if(!name){$('#projectTitleInput').focus();return false;}
+          const dueValue=$('#projectDueInput').value;const due=dueValue||'';
+          const p={id:Date.now()+Math.floor(Math.random()*1000),name,description:$('#projectDescriptionInput').value.trim()||'A new initiative to plan and deliver.',icon:'code',color:['','teal','orange','pink'][projects.length%4],owner:$('#sidebarName').textContent,progress:0,status:$('#projectStatusInput').value,due,tasks:0,done:0,tone:'purple'};projects.unshift(p);addActivity('project','created a project',name,p.id);closeModal();renderOverview();if(currentPage==='projects')renderProjects();toast('Project created',name);persistWorkspace();return true;
+        });
+      };
+      $('#modalForm').addEventListener('submit', e=>{e.preventDefault();if(modalSubmitHandler) modalSubmitHandler(e.currentTarget);});
+      $('#modalClose').addEventListener('click',closeModal);$('#modalCancel').addEventListener('click',closeModal);$('#modalBackdrop').addEventListener('click',e=>{if(e.target===$('#modalBackdrop'))closeModal();});
+      document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeSidebar();}if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('#globalSearch').focus();}});
+      $$('.nav-button[data-page]').forEach(btn=>btn.addEventListener('click',()=>setPage(btn.dataset.page)));
+      $$('[data-page="settings"]').forEach(btn=>btn.addEventListener('click',()=>setPage('settings')));
+      $$('[data-goto]').forEach(btn=>btn.addEventListener('click',()=>setPage(btn.dataset.goto)));
+      $('#brandHome').addEventListener('click',()=>{showLanding(false);setPage('overview');});
+      $('#landingBtn').addEventListener('click',()=>showLanding(true));$('#learnMore').addEventListener('click',()=>showLanding(true));$('#landingBrand').addEventListener('click',()=>showLanding(false));$('#openWorkspaceFromLanding').addEventListener('click',()=>{showLanding(false);setPage('overview');});$('#heroOpenApp').addEventListener('click',()=>{showLanding(false);setPage('overview');});
+      $('#newTaskTop').addEventListener('click',openTaskModal);$('#newTaskPage').addEventListener('click',openTaskModal);$('#calendarAddTask').addEventListener('click',openTaskModal);
+      $('#newProjectTop').addEventListener('click',openProjectModal);$('#sideAddProject').addEventListener('click',openProjectModal);
+      $('#mobileMenu').addEventListener('click',()=>{$('#sidebar').classList.add('open');$('#mobileOverlay').classList.add('show');});$('#mobileOverlay').addEventListener('click',closeSidebar);
+      $('#sideProjectList').addEventListener('click',e=>{const btn=e.target.closest('[data-project-id]');if(btn)showProjectDetail(btn.dataset.projectId);});
+      $('#projectFilters').addEventListener('click',e=>{const btn=e.target.closest('[data-filter]');if(!btn)return;projectFilter=btn.dataset.filter;$$('.filter-pill', $('#projectFilters')).forEach(b=>b.classList.toggle('active',b===btn));renderProjects();});
+      $('#taskFilters').addEventListener('click',e=>{const btn=e.target.closest('[data-filter]');if(!btn)return;taskFilter=btn.dataset.filter;$$('.filter-pill', $('#taskFilters')).forEach(b=>b.classList.toggle('active',b===btn));renderTasks();});
+      $('#activityFilters').addEventListener('click',e=>{const btn=e.target.closest('[data-filter]');if(!btn)return;activityFilter=btn.dataset.filter;$$('.filter-pill', $('#activityFilters')).forEach(b=>b.classList.toggle('active',b===btn));renderActivity();});
+      $('#taskClearFilters').addEventListener('click',()=>{taskFilter='all';searchTerm='';$('#globalSearch').value='';$$('.filter-pill',$('#taskFilters')).forEach((b,i)=>b.classList.toggle('active',i===0));renderTasks();toast('Filters reset');});
+      $('#projectSort').addEventListener('click',()=>{sortDescending=!sortDescending;$('#projectSort').innerHTML=`<svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M7 12h10m-7 5h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>Sort: ${sortDescending?'highest first':'lowest first'}`;renderProjects();});
+      $('#prevWeek').addEventListener('click',()=>{calendarOffset--;renderCalendar();});$('#nextWeek').addEventListener('click',()=>{calendarOffset++;renderCalendar();});$('#thisWeek').addEventListener('click',()=>{calendarOffset=0;renderCalendar();});
+      $('#activityMarkRead').addEventListener('click',()=>toast('All caught up','You have no unread activity in this demo.'));
+      $('#notificationsBtn').addEventListener('click',()=>toast('You’re all caught up','New task updates will appear here.'));
+      $('#exportReport').addEventListener('click',()=>{const csv=[['Project','Status','Progress','Tasks complete','Total tasks','Due date'],...projects.map(p=>[p.name,p.status,p.progress+'%',p.done,p.tasks,p.due])].map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='devtrack-project-report.csv';a.click();URL.revokeObjectURL(url);toast('Report exported','Your project summary was downloaded as a CSV.');});
+      $('#profileForm').addEventListener('submit',e=>{e.preventDefault();const name=$('#profileName').value.trim();if(!name)return;$('#sidebarName').textContent=name;$('#sidebarAvatar').textContent=initials(name);$$('.page-heading h1').forEach(h=>{if(h.textContent.includes('Good evening,'))h.innerHTML=`Good evening, ${esc(name.split(' ')[0])} <span aria-hidden="true">✦</span>`;});tasks.forEach(t=>t.assignee=name);projects.forEach(p=>p.owner=name);persistWorkspace();toast('Profile updated','Workspace display name updated.');});
+      $('#settingsNotifications').addEventListener('click',()=>{$('#remindersSwitch').focus();toast('Notification preferences','Use the switches in Workspace preferences to update your choices.');});$('#settingsWorkspace').addEventListener('click',()=>toast('Workspace settings','Workspace settings are represented in this demo.'));
+      $('#remindersSwitch').addEventListener('change',e=>toast('Task reminders',e.target.checked?'Reminders enabled for this preview.':'Reminders disabled for this preview.'));
+      $('#summarySwitch').addEventListener('change',e=>toast('Weekly summary',e.target.checked?'Weekly summary enabled.':'Weekly summary disabled.'));
+      $('#updatesSwitch').addEventListener('change',e=>toast('Product updates',e.target.checked?'Product updates enabled.':'Product updates disabled.'));
+      $('#globalSearch').addEventListener('input',e=>{searchTerm=e.target.value.trim().toLowerCase();renderOverviewProjects();renderOverviewTasks();if(currentPage==='projects')renderProjects();if(currentPage==='tasks')renderTasks();if(currentPage==='activity')renderActivity();});
+      const originalSetPage=setPage;
+      window.addEventListener('hashchange',()=>{const id=location.hash.slice(1);if(id==='features'||id==='how-it-works')showLanding(true);});
+      // API-backed anonymous demo sessions. Sample data is not live team activity.
+      initialize();
+    })();
+  </script>
+</body>
+</html>
