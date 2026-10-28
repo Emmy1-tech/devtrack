@@ -1,0 +1,16 @@
+{
+  "name": "devtrack",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Project and task workspace by Emmy1-tech",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "check": "node --check server.js && node --check tests/api.test.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "license": "MIT"
+}
