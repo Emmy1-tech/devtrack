@@ -1,26 +1,41 @@
-# DevTrack: security and limitations
+# DevTrack security and limitations
 
-This application is a public portfolio **demonstration**. Do not enter sensitive personal or business information.
+DevTrack is a **public portfolio demonstration**. Do not store secrets, credentials, sensitive personal information, or confidential business data in it.
+
+## Deployment models
+
+- **Public demo:** Cloudflare Worker with Cloudflare D1 persistence for anonymous browser sessions.
+- **Local Node.js app:** Session-scoped JSON files in the `data/` folder. These files are not intended for shared production hosting.
+- Neither version implements authenticated user accounts, roles, or real team collaboration.
 
 ## Protections implemented
 
-- 160-bit random identifiers in HttpOnly, SameSite=Lax cookies; Secure is set for HTTPS requests.
-- Cookie values are checked against a strict hexadecimal pattern before being used as filenames.
-- Separate JSON files by anonymous session (not by authenticated account).
-- Validation of project/task fields, enumerated statuses and priorities, dates, project IDs, payload sizes and workspace limits.
-- Basic same-origin checking for requests carrying an Origin header, and no permissive CORS response.
-- Baseline Content Security Policy, no-framing, no-sniff and referrer headers.
-- Per-session serialized writes and atomic file rename within one Node process.
+The local application and hosted adaptation include these baseline safeguards:
 
-## Not implemented
+- Random 160-bit anonymous session IDs, stored in HttpOnly, SameSite=Lax cookies; the hosted HTTPS version sets Secure.
+- Validation of project and task fields, statuses, priorities, dates, associations, payload sizes, and workspace limits.
+- Same-origin checking on requests that provide an Origin header; no intentionally permissive cross-origin API.
+- Basic response security headers, including content-type no-sniff, framing restrictions, referrer policy, and baseline Content Security Policy.
+- Separate workspaces by anonymous browser session.
+- The local Node server serializes same-session writes and uses atomic file replacement; the live hosted version uses D1.
 
-- Named user accounts, logins or authorization policies.
-- A complete CSRF token strategy. SameSite and Origin checks are only a baseline.
-- A strict CSP without inline scripts and styles.
-- Managed storage, cross-process write locking, backups, retention/deletion policies, or guaranteed persistence across deployments.
-- Distributed rate limiting, production monitoring, privacy/legal review, or security audit.
-- Concurrent-tab optimistic locking; the workspace editor uses last-write-wins snapshot saves.
+These safeguards are **not** a substitute for a complete security audit.
 
-Anonymous session cookies are bearer credentials for the demo data. Anyone who gets a cookie may access that browser session. Free hosting instances may delete their filesystem on restart.
+## Limitations
 
-To report a vulnerability, use private GitHub vulnerability reporting if available. Never post security tokens or session cookies in a public issue.
+- No sign-in, permissions model, team sharing, or strong user identity.
+- Anonymous session cookies act as bearer credentials for that session's demo data.
+- No complete CSRF-token protection; Origin and SameSite checks are baseline defenses only.
+- Content Security Policy currently permits inline scripts/styles.
+- No full rate-limiting, abuse prevention, independent penetration testing, or privacy/legal review.
+- Snapshot updates use last-write-wins behavior; editing in multiple tabs can overwrite changes.
+- No guaranteed backup, retention schedule, deletion workflow, or indefinite storage promise for hosted D1 workspaces.
+- Local Node JSON persistence should not be used as durable storage on ephemeral free hosts.
+- Cloudflare free-tier quotas can limit availability under heavier usage.
+- The Cloudflare-specific deployed Worker source is not yet versioned in this repository. See [DEPLOYMENT.md](DEPLOYMENT.md).
+
+## Security reports
+
+Use GitHub's private vulnerability reporting where available. Do not include session cookies, passwords, API tokens, or private customer data in a public issue.
+
+See the [live demo](https://devtrack-emmy.emmy1-tech.workers.dev/) and [README](README.md).
