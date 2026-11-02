@@ -1,87 +1,92 @@
 # DevTrack
 
-**A developer workspace for turning plans into finished work.**
+**A focused developer workspace for planning projects, tracking tasks, and seeing progress clearly.**
 
-[Repository](https://github.com/Emmy1-tech/devtrack) · [API reference](docs/API.md) · [Deployment guide](DEPLOYMENT.md) · [Security](SECURITY.md)
+### [Open the Live DevTrack Demo](https://devtrack-emmy.emmy1-tech.workers.dev/)
 
-Built by **[Emmy1-tech](https://github.com/Emmy1-tech)**. DevTrack began as an idea for a calmer place to manage software projects without losing sight of the small steps. It brings together project tracking, tasks, deadlines, a calendar, and activity in one responsive interface.
+[Live demo](https://devtrack-emmy.emmy1-tech.workers.dev/) · [API documentation](docs/API.md) · [Deployment guide](DEPLOYMENT.md) · [Security & limitations](SECURITY.md) · [GitHub profile](https://github.com/Emmy1-tech)
 
-> **Demo notice:** the starting projects and activity are examples, not real team data. DevTrack has anonymous browser sessions, not accounts, secure team collaboration, or durable hosted storage. Please use throwaway information only.
+**Built and maintained by [Emmy1-tech](https://github.com/Emmy1-tech).**
 
-## Try DevTrack
+DevTrack is a responsive project-management dashboard with project and task tracking, upcoming deadlines, activity, calendar views, and progress summaries. The **live demo opens in a regular browser**, so recruiters and visitors can try it on a laptop, tablet, or phone without installing anything.
 
-**Hosted demo:** Not deployed or verified yet. A real URL will be added after a successful deployment and smoke test.
+> **Demo notice:** DevTrack includes example projects and uses anonymous browser sessions, not user accounts. Each visitor gets a separate demo workspace. Please do not enter private or sensitive information. This is a portfolio demonstration, not a production collaboration service.
 
-**Local test:** After installing Node.js 20+, download this repository and run:
+## Explore the live application
+
+**[Launch DevTrack →](https://devtrack-emmy.emmy1-tech.workers.dev/)**
+
+In the hosted demo, you can:
+
+- Explore the responsive dashboard, project overview, and activity views.
+- Create and manage projects with descriptions, statuses, and target dates.
+- Add, update, complete, and remove tasks, with priorities and due dates.
+- Search and filter projects and track completion percentages based on task status.
+- Use the weekly calendar and export task details as CSV.
+- Refresh the page and revisit your workspace in the same browser session while its demo session remains available.
+
+The hosted site uses **Cloudflare Workers** for the web/API layer and **Cloudflare D1** to store anonymous demo workspaces. The local development version in this repository uses a **Node.js HTTP server** and session-scoped JSON files.
+
+## Technology
+
+| Area | Implementation |
+| --- | --- |
+| Interface | HTML, CSS, vanilla JavaScript |
+| Local server and API | Node.js 20+ built-in HTTP server (`server.js`) |
+| Public demo hosting | Cloudflare Workers |
+| Hosted demo persistence | Cloudflare D1 (SQLite-based) |
+| Local persistence | Per-session JSON files |
+| Testing | Node.js built-in test runner and HTTP integration tests |
+| CI | GitHub Actions on Node.js 20 and 22 |
+
+**Deployment note:** The repository contains the local Node.js implementation. The live Cloudflare Worker is an adaptation of that app for hosted execution and D1 storage; its Cloudflare-specific deployment source is not yet maintained in this repository. The hosted link above is the verified live demo.
+
+## Architecture
+
+The browser loads the dashboard and calls same-origin API endpoints such as `/api/workspace`, `/api/projects`, `/api/tasks`, and `/api/stats`. The API validates updates, calculates project progress, and keeps each anonymous visitor's demo workspace separate.
+
+- **On Cloudflare:** Worker-hosted application and API → D1 workspace storage.
+- **Locally:** Node.js HTTP server → session-based JSON workspace storage.
+
+See [the API reference](docs/API.md) for supported endpoints, request examples, and validation rules.
+
+## Development and tests
+
+The **live demo requires no setup**. Developers who want to run the source locally can follow [LOCAL-SETUP.md](LOCAL-SETUP.md).
+
+Requirements: Node.js 20 or newer. This project has no third-party runtime dependencies.
 
 ```bash
 npm start
 ```
 
-Then open **http://localhost:1295**. No `npm install` required: the backend uses only built-in Node.js modules. On Windows you may also double-click `start-local.bat`.
-
-Run the tests:
+Run the checks and integration tests:
 
 ```bash
 npm run check
 npm test
 ```
 
-## Features
-
-- Responsive landing page and developer dashboard.
-- Project creation, search, status filters, target dates, and calculated task completion percentages.
-- Task creation, completion/reopening, priorities, due dates and simple task views.
-- Weekly calendar and activity timeline for planning.
-- Project-summary CSV export and profile display settings.
-- JSON API for workspaces, projects, tasks, activity, basic stats and CSV export.
-- Anonymous browser sessions with server-side JSON persistence and per-session queued writes.
-- Input validation, same-origin checking, security headers, baseline CSP, and automated integration tests.
-- CI checks for Node.js 20 and 22.
-
-## Architecture
+## Repository structure
 
 ```text
-Browser (public/index.html)
-        |
-        | fetch /api/workspace
-        v
-Node.js server (server.js)
-        |
-        | validate + serialize session updates
-        v
-data/sessions/<random-session-id>.json (ignored by Git)
+public/index.html          Responsive dashboard interface
+server.js                  Local Node.js API and session storage
+tests/api.test.js          API integration tests
+docs/API.md                API contract and examples
+.github/workflows/ci.yml   Automated quality checks
+DEPLOYMENT.md              Hosted demo and deployment notes
+SECURITY.md                Security considerations and known limitations
+LOCAL-SETUP.md             Local development instructions
+render.yaml                Optional Node.js/Render configuration
 ```
 
-| Area | Technology |
-| --- | --- |
-| Interface | HTML, CSS, vanilla JavaScript |
-| Backend | Node.js 20+ built-in HTTP server |
-| Storage | Session-scoped local JSON files |
-| Tests | Node built-in `node:test` |
-| Automation | GitHub Actions CI on Node 20 and 22 |
-| Hosting | Render-compatible `render.yaml` |
+## Limitations and future work
 
-## Repository files
+This is a **portfolio demo**, not an authenticated multi-user platform. There are no user accounts, roles, or team sharing features. Simultaneous edits from multiple tabs may overwrite one another, and there is no guarantee of indefinite retention of anonymous demo data. Additional work would include authentication, conflict detection, stronger security controls, automated deployment from source, persistent user-owned projects, and production monitoring.
 
-```text
-.github/workflows/ci.yml   Automated checks
-public/index.html          Responsive interface
-server.js                  Node.js API, sessions, storage
-tests/api.test.js          HTTP integration tests
-docs/API.md                API contract
-README.md                  Project guide
-SECURITY.md                Limitations and safeguards
-DEPLOYMENT.md              Deployment instructions
-LOCAL-SETUP.md             Windows/local troubleshooting
-render.yaml                Optional Render service config
-start-local.bat            Windows launcher
-```
+See [SECURITY.md](SECURITY.md) for further details.
 
-## Limits and roadmap
+**Project:** [DevTrack](https://github.com/Emmy1-tech/devtrack) · **Live demo:** [devtrack-emmy.emmy1-tech.workers.dev](https://devtrack-emmy.emmy1-tech.workers.dev/)
 
-DevTrack is a **portfolio project, not a production multi-user service**. The current interface uses snapshot saves to the API: simultaneous edits across browser tabs may overwrite each other. Anonymous sessions are not user authentication. The JSON store is only appropriate for a single Node process; hosting restarts may remove data.
-
-Next steps include a managed database and migrations, authenticated users, per-user authorization, a stronger CSRF strategy, a stricter CSP without inline scripts/styles, better accessibility tests, true task history, and production monitoring.
-
-Created and maintained by Emmy1-tech. Licensed under MIT; see [LICENSE](LICENSE).
+Created and maintained by Emmy1-tech. Licensed under the [MIT License](LICENSE).
